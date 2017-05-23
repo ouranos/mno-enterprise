@@ -12,7 +12,7 @@
 
 module MnoEnterprise::Concerns::Models::SharedEntity
   extend ActiveSupport::Concern
-b
+
   #==================================================================
   # Included methods
   #==================================================================
