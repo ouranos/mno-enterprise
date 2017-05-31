@@ -11,6 +11,7 @@ group :test do
   gem 'shoulda-matchers'
   gem 'fakeweb', '~> 1.3'
   gem 'timecop'
+  gem 'climate_control'
   # gem 'simplecov'
 end
 
