@@ -29,6 +29,7 @@ require 'mno_enterprise/database_extendable'
 # Settings
 require 'config'
 require 'figaro'
+require 'json-schema'
 
 require 'mandrill_client'
 require 'accountingjs_serializer'
