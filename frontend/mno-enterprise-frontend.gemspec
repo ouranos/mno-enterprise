@@ -17,6 +17,9 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["spec/**/*"]
 
+  s.platform = Gem::Platform::RUBY
+  s.required_ruby_version = '>= 2.3.1'
+
   # TODO: add dependencies
   s.add_dependency 'mno-enterprise-core', s.version
   s.add_dependency 'mno-enterprise-api', s.version
