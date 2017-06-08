@@ -16,5 +16,6 @@ group :test do
 end
 
 group :test, :development do
+  gem 'figaro'
   # gem 'rubocop', require: false
 end
