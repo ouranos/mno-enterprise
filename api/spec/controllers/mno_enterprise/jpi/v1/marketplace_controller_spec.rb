@@ -71,7 +71,6 @@ module MnoEnterprise
       subject { get :index }
 
       before do
-        MnoEnterprise.marketplace_listing = nil
         api_stub_for(get: '/apps', response: from_api([app]))
         # TODO: Shouldn't need to stub this
         api_stub_for(get: "/apps/#{app.id}/shared_entities", response: from_api([]))
