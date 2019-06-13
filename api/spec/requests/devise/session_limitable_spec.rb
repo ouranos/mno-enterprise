@@ -1,6 +1,8 @@
 require 'rails_helper'
 
-RSpec.describe Devise::Models::SessionLimitable, type: :model do
+RSpec.describe Devise::Models::SessionLimitable, type: :request do
+  include DeviseRequestSpecHelper
+
   # Initialize this way so the class reload is taken into account (the factory doesnt reload the User class)
   let(:user) do
     MnoEnterprise::User
@@ -13,7 +15,7 @@ RSpec.describe Devise::Models::SessionLimitable, type: :model do
     # Removes MnoEnterprise::User from object-space:
     MnoEnterprise.send(:remove_const, :User)
     # Reloads the module (require might also work):
-    load 'app/models/mno_enterprise/user.rb'
+    load '../core/app/models/mno_enterprise/user.rb'
   end
 
   before do
@@ -26,21 +28,26 @@ RSpec.describe Devise::Models::SessionLimitable, type: :model do
     reload_user
   end
 
-  describe '#update_unique_session_id!' do
-    subject { user.update_unique_session_id!('session-id') }
+  before do
+    stub_audit_events
 
-    before do
-      stub_api_v2(:get, '/users', [user], [], {filter: {email: 'test@maestrano.com'}, page: {number: 1, size: 1}})
-    end
+    allow(Devise).to receive(:friendly_token).and_return('session-id')
 
-    let!(:update_stub) do
-      stub_api_v2(:post, "/users", user)
-        .with(body: { data: { id: user.id, type: 'users', attributes: { unique_session_id: 'session-id' } } }.to_json)
-    end
+    stub_api_v2(:get, "/users", [user], [], { filter: { email: user.email }, 'page[number]': 1, 'page[size]': 1 })
+    stub_api_v2(:patch, "/users/#{user.id}", user)
 
-    it { expect(user).to respond_to(:update_unique_session_id!) }
+    login_as(user, scope: warden_scope(:user))
+  end
 
-    it 'updates the session id' do
+  let!(:update_stub) do
+    stub_api_v2(:post, "/users", user)
+      .with(body: { data: { id: user.id, type: 'users', attributes: { unique_session_id: 'session-id' } } }.to_json)
+  end
+
+  describe 'change unique_session_id when user logs in again' do
+    subject { get '/mnoe/jpi/v1/current_user.json' } # TODOs
+
+    it 'does something' do
       subject
       expect(update_stub).to have_been_requested
     end

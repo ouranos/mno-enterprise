@@ -11,11 +11,7 @@ module Devise
       extend ActiveSupport::Concern
 
       def update_unique_session_id!(unique_session_id)
-        self.attributes = {
-          unique_session_id: unique_session_id
-        }
-        save!
-        reload
+        self.update_attributes(unique_session_id: unique_session_id)
       end
     end
   end
