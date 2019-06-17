@@ -41,17 +41,25 @@ RSpec.describe Devise::Models::SessionLimitable, type: :request do
     end
 
     context 'when another session got created in the meantime' do
-      before do
-        Warden.on_next_request do |proxy|
-          proxy.session(warden_scope(:user))['sso_session'] = 'another-session-id'
-        end
-      end
+      # Stub cache write as this doesn't play well with class reloading:
+      # > "MnoEnterprise::User can't be referred to"
+      before { allow(Rails.cache).to receive(:write).and_return(true) }
 
-      # TODO: spec doesn't pass / Warden::Manager.after_set_user only: :fetch is never called
-      # it 'logs the user out and return 401' do
-      #   subject
-      #   expect(response).to have_http_status(:unauthorized)
-      # end
+      # Stub patch when logging out
+      before { stub_api_v2(:patch, "/users/#{user.id}", user) }
+
+      it 'logs the user out and return 401' do
+        # 1st request
+        get '/mnoe/jpi/v1/current_user.json'
+
+        # Simulate another session being opened by changing the session id
+        user.sso_session = 'another-session-id'
+        stub_user(user)
+
+        # 2nd request
+        get '/mnoe/jpi/v1/current_user.json'
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 end
