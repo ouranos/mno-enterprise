@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Devise::Models::SessionLimitable, type: :request do
+RSpec.describe 'Devise::SessionLimitable', type: :request do
   include DeviseRequestSpecHelper
 
   # Initialize this way so the class reload is taken into account (the factory doesnt reload the User class)
